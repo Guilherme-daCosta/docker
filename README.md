@@ -80,7 +80,7 @@ RUN pip install flask
 COPY app.py /app/app.py
 
 # Expondo a porta
-EXPOSE 5000
+EXPOSE 5001
 
 # Comando para rodar a aplicação
 CMD [ "python", "app.py" ]
@@ -138,7 +138,7 @@ docker ps -a
 4. Rodando em Modo Background (Detached Mode):
 Para rodar o container em segundo plano:
 ```bash
-docker run -p 3000:3000 -d nome_imagem
+docker run -p 5001:5001 -d nome_imagem
 ```
 O comando `-d` faz com que o container rode em segundo em plano (modo `detached`).
 
