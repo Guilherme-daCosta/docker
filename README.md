@@ -66,23 +66,24 @@ Um **Dockerfile** é um arquivo de texto que contém os passos para **criar uma 
 
 ```dockerfile
 # Imagem base
-FROM python:3.9-slim
+FROM python:3.12
 
 # Definindo o diretório de trabalho
 WORKDIR /app
 
 # Copiando o arquivo de dependências e instalando-as
 COPY requirements.txt /app/
-RUN pip install -r requirements.txt
+
+RUN pip install flask
 
 # Copiando o código da aplicação
-COPY . /app/
+COPY app.py /app/app.py
 
 # Expondo a porta
 EXPOSE 5000
 
 # Comando para rodar a aplicação
-CMD ["python", "app.py"]
+CMD [ "python", "app.py" ]
 ```
 
 ### Construindo e Verificando a Imagem
@@ -148,7 +149,23 @@ docker logs id_container
 ```
 
 ### Boas Práticas e Otimização
-1. Separar a Cópia de Arquivos:
+1. Utilizar arquivos de gerenciamento de dependências:
+Arquivos de gerenciamento de dependências garantem que todas as bibliotecas necessárias sejam instaladas de forma consistente, reduzindo problemas de compatibilidade e otimizando o cache do Docker.
+
+**Crie o arquivo de dependências**  
+   Utilize a ferramenta da sua linguagem para gerar um arquivo de dependências. Exemplos:
+   - **Python:**  
+     ```bash
+     pip freeze > requirements.txt
+     ```
+**Benefícios**
+- **Reprodutibilidade:** Garante que as mesmas dependências sejam usadas em qualquer ambiente.
+- **Performance:** Aproveita o cache do Docker, reduzindo o tempo de build.
+- **Manutenção:** Facilita atualizações e rastreamento de dependências.
+
+---
+
+2. Separar a Cópia de Arquivos:
 Se tentar reiniciar um container com a flag --rm, ele será removido automaticamente:
 
 Exemplo:
@@ -158,18 +175,43 @@ RUN pip install -r requirements.txt
 COPY . /app/
 ```
 
-2. Utilizar .dockerignore:
+---
+
+3. Utilizar .dockerignore:
 User o `.dockerignore` para evitar que arquivos desnecessários (como `.git`, `node_modules`, etc.) sejam copiados para dentro da imagem.
 
-3. Trabalhar com Tags:
+---
+
+4. Trabalhar com Tags:
 Sempre use tags para versionar suas imagens. Isso é essecial, especialmente em ambientes de CI/CD, para garantir que você está utilizando a versão correta da imagem.
 Exemplo:
 ```bash
 docker build -t minha_imagem:v1.0 .
 ```
 
-4. Imagem Slim ou Alpine:
+---
+
+5. Imagem Slim ou Alpine:
 Sempre que possível, use imagens slim ou alpine para reduzir o tamanho da imagem e melhorar a segurança e performance.
+
+---
+
+### Dockerfile refatorado
+```docckerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt /app/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py /app/app.py
+
+EXPOSE 5001
+
+CMD [ "python", "app.py" ]
+```
 
 ### Conclusão
 
